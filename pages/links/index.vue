@@ -37,7 +37,7 @@
             <div
                 class="absolute bottom-0 bg-white w-full h-16 rounded-b-md border-t border-gray-200 flex items-center justify-end">
                 <button class="bg- py-2 px-14 bg-blue-500 rounded-lg text-white mr-5 hover:bg-blue-600">Save</button>
-                </div>
+            </div>
         </section>
     </div>
 </template>
@@ -45,23 +45,6 @@
 import { useLinksStore } from '../../store/LinksStore'
 
 const store = useLinksStore();
-
-// type LinksType = {
-//     id: number,
-//     link: string[],
-//     platform: string[],
-//     created_at: string
-// }
-
-// import { createClient } from '@supabase/supabase-js'
-// const supabase = createClient('https://aykvzefkfbrbvownvkcz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5a3Z6ZWZrZmJyYnZvd252a2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY5MzgzMzcsImV4cCI6MjA1MjUxNDMzN30.VtbrIIbyyed21H03RKOF4LV8pzgo6sRKO1DCwKZ1YfQ')
-// const links = ref<LinksType[] | null>([])
-
-// async function getLinks() {
-//     const { data } = await supabase.from("Platform Links").select()
-//     links.value = data
-//     console.log(links.value)
-// }
 
 definePageMeta({
     layout: 'main'
@@ -108,7 +91,7 @@ const addNewLink = () => {
 
     store.links.push({
         "id": store.idx++,
-        "color": "bg-gray-200",
+        "color": "bg-gray-300",
     });
 }
 
@@ -119,7 +102,7 @@ const setUpdateLink = (platform: string, index: number) => {
         store.links[index].color = platforms[platform].color
 
     } else {
-        store.links[index].color = "bg-gray-200"
+        store.links[index].color = "bg-gray-300"
         delete store.links[index].platform
         delete store.links[index].icon
     }
@@ -129,10 +112,6 @@ const setLink = (link: string, index: number) => {
     store.links[index].link = link
 }
 
-const check = (event: any) => {
-    event.target.style.position = 'absolute';
-    console.log(event.target)
-}
 </script>
 
 <style scoped></style>

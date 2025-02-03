@@ -37,6 +37,8 @@ let { index } = defineProps(['index'])
 
 const { links } = useLinksStore();
 
+let config = useRuntimeConfig()
+
 let selected = ref('default');
 let link = ref('');
 
@@ -87,6 +89,7 @@ watch(link, async (newInput, _) => {
 })
 
 onMounted(() => {
+    // console.log('check', config.apiSecret, config.public.projectUrl)
     if (links[index].platform) selected.value = reversePlatforms[links[index].platform || 'Undefined'].name;
     if (links[index].link) link.value = links[index].link;
 })
