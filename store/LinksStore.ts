@@ -6,9 +6,24 @@ export const useLinksStore = defineStore("links", {
       idx: 0 as number,
       links: [] as linksType[],
       profile: {} as profileDetailType,
+      check: {} as any,
     };
   },
-  actions: {},
+  actions: {
+    async getLinks() {
+      const supabase = useSupabaseClient();
+
+      const { data } = await supabase
+        .from("Links")
+        .select()
+        .returns<linksType[]>();
+
+      if (data) {
+        this.links = data;
+      }
+      console.log(data);
+    },
+  },
 });
 
 interface linksType {
@@ -17,6 +32,7 @@ interface linksType {
   icon?: string;
   platform?: string;
   link?: string;
+  code?: string;
 }
 
 interface profileDetailType {
@@ -24,4 +40,11 @@ interface profileDetailType {
   firstName?: string;
   lastName?: string;
   email?: string;
+}
+
+interface runtimeConfigType {
+  public: {
+    apiKey: string;
+    projectUrl: string;
+  };
 }

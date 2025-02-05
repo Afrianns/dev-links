@@ -39,7 +39,7 @@ const { links } = useLinksStore();
 
 let config = useRuntimeConfig()
 
-let selected = ref('default');
+let selected = ref<string>('default');
 let link = ref('');
 
 interface reversePlatformsType {
@@ -89,8 +89,9 @@ watch(link, async (newInput, _) => {
 })
 
 onMounted(() => {
-    // console.log('check', config.apiSecret, config.public.projectUrl)
-    if (links[index].platform) selected.value = reversePlatforms[links[index].platform || 'Undefined'].name;
+    console.log(index, links[index].code)
+
+    if (links[index].code) selected.value = links[index].code;
     if (links[index].link) link.value = links[index].link;
 })
 

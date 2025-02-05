@@ -15,10 +15,21 @@
   @apply w-full h-fit py-2 px-3 rounded-md flex items-center justify-between;
 }
 
+.btn {
+  @apply py-1 px-6 rounded-md border cursor-pointer;
+}
+
 .blue-btn {
-  @apply py-1 px-6 rounded-md border border-blue-600 text-blue-600 hover:bg-blue-100 cursor-pointer;
+  @apply btn border-blue-600 text-blue-600 hover:bg-blue-100;
+}
+.red-btn {
+  @apply btn border-red-600 text-red-600 hover:bg-red-100;
 }
 
 .active-link {
   @apply text-blue-600 bg-blue-100;
+}
+
+.login-btn-styles {
+  @apply text-xs font-semibold mt-3 py-2 px-6 border border-orange-300 rounded text-white uppercase w-full;
 }

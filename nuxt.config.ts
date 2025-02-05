@@ -29,15 +29,23 @@ export default defineNuxtConfig({
       ],
     },
   },
-  runtimeConfig: {
-    apiKey: "",
-    public: {
-      projectUrl: "",
-    }
+  supabase: {
+    redirectOptions: {
+      login: "/",
+      callback: "",
+      include: ["/links", "/links/*"],
+      exclude: [],
+      cookieRedirect: false,
+    },
   },
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
-  modules: ["@nuxtjs/tailwindcss", "@nuxt/icon", "@pinia/nuxt"],
+  modules: [
+    "@nuxtjs/tailwindcss",
+    "@nuxt/icon",
+    "@pinia/nuxt",
+    "@nuxtjs/supabase",
+  ],
   tailwindcss: {
     cssPath: "~/assets/css/tailwind.css",
     config: {},

@@ -38,19 +38,25 @@
                 class="absolute bottom-0 bg-white w-full h-16 rounded-b-md border-t border-gray-200 flex items-center justify-end">
                 <button class="bg- py-2 px-14 bg-blue-500 rounded-lg text-white mr-5 hover:bg-blue-600">Save</button>
             </div>
+            <button @click="store.getLinks">Click me</button>
+            {{ store.links }}
         </section>
     </div>
 </template>
 <script setup lang="ts">
-import { useLinksStore } from '../../store/LinksStore'
 
-const store = useLinksStore();
+import { useLinksStore } from '../../store/LinksStore'
 
 definePageMeta({
     layout: 'main'
 })
 
+
+const store = useLinksStore();
+
+
 type platformsDataType = {
+    code: string,
     name: string,
     icon: string,
     color: string,
@@ -71,13 +77,12 @@ type linkObj = {
 let idx = ref<number>(0);
 let listLinks = ref<linkObj[]>([]);
 
-
 const platforms: platformsType = {
-    "PW": { name: "Person Website", icon: "mdi:earth", color: "bg-orange-500" },
-    "GH": { name: "Github", icon: "mdi:github", color: "bg-gray-500" },
-    "CW": { name: "Codewars", icon: "cib:codewars", color: "bg-red-500" },
-    "LC": { name: "Leetcode", icon: "tabler:brand-leetcode", color: "bg-orange-500" },
-    "HR": { name: "Hackerrank", icon: "cib:hackerrank", color: "bg-emerald-500" },
+    "PW": { code: "PW", name: "Person Website", icon: "mdi:earth", color: "bg-orange-500" },
+    "GH": { code: "GH", name: "Github", icon: "mdi:github", color: "bg-gray-500" },
+    "CW": { code: "CW", name: "Codewars", icon: "cib:codewars", color: "bg-red-500" },
+    "LC": { code: "LC", name: "Leetcode", icon: "tabler:brand-leetcode", color: "bg-orange-500" },
+    "HR": { code: "HR", name: "Hackerrank", icon: "cib:hackerrank", color: "bg-emerald-500" },
 }
 
 // simple-icons:frontendmentor
@@ -100,6 +105,7 @@ const setUpdateLink = (platform: string, index: number) => {
         store.links[index].platform = platforms[platform].name
         store.links[index].icon = platforms[platform].icon
         store.links[index].color = platforms[platform].color
+        store.links[index].code = platforms[platform].code
 
     } else {
         store.links[index].color = "bg-gray-300"

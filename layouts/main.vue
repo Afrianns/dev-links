@@ -1,5 +1,6 @@
 <template>
-    <nav
+
+    <nav v-if="user"
         class="flex justify-between bg-white mx-auto py-5 px-10 rounded-md my-5 w-[1000px] border border-slate-200 shadow-sm items-center text-gray-700">
         <h1 class="flex items-center gap-3 font-bold text-blue-950"> <svg class="bg-blue-200 py-1 px-2 rounded-lg"
                 xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 20 20">
@@ -27,17 +28,28 @@
                 </nuxt-link>
             </li>
         </ul>
-        <div v-if="checkParams(data.fullPath)">
-            <nuxt-link to="/jack">
-                <h2 class="blue-btn">Preview
+        <div class="flex gap-x-2">
+            <div v-if="!loading" @click="logOut">
+                <h2 class="red-btn">Logout
                 </h2>
-            </nuxt-link>
-        </div>
-        <div v-if="!checkParams(data.fullPath)">
-            <nuxt-link to="/links">
-                <h2 class="blue-btn">Unpreview
+            </div>
+            <div v-if="loading">
+                <h2 class="red-btn opacity-55 flex items-center justify-center">
+                    <Icon name="line-md:loading-twotone-loop" size="1.5rem" />
                 </h2>
-            </nuxt-link>
+            </div>
+            <div v-if="checkParams(data.fullPath)">
+                <nuxt-link to="/jack">
+                    <h2 class="blue-btn">Preview
+                    </h2>
+                </nuxt-link>
+            </div>
+            <div v-if="!checkParams(data.fullPath)">
+                <nuxt-link to="/links">
+                    <h2 class="blue-btn">Unpreview
+                    </h2>
+                </nuxt-link>
+            </div>
         </div>
     </nav>
     <main>
@@ -45,7 +57,14 @@
     </main>
 </template>
 <script setup lang="ts">
+
 const data = useRoute()
+
+const supabase = useSupabaseClient()
+
+const user = useSupabaseUser()
+
+const loading = ref(false)
 
 const checkParams = (path: string) => {
     const regexp = new RegExp(/(^\/links\/$)|(^\/links$)|(^\/links\/profile(\/|)$)/, 'g')
@@ -53,30 +72,17 @@ const checkParams = (path: string) => {
     return (regexp.test(path))
 }
 
-// useHead({
-//     title: 'My App',
-//     meta: [
-//         {
-//             name: 'Developer Links Site',
-//             content: 'This is Developer Links Site, where developer can share & showcase achievment as programmer.',
-//         },
-//     ],
-//     link: [
-//         {
-//             rel: 'preconnect',
-//             href: "https://fonts.googleapis.com",
-//         },
-//         {
-//             rel: 'preconnect',
-//             href: "https://fonts.gstatic.com",
-//             crossorigin: 'anonymous'
-//         },
-//         {
-//             rel: "stylesheet",
-//             href: "https://fonts.googleapis.com/css2?family=Red+Hat+Text:ital,wght@0,300..700;1,300..700&display=swap"
-//         }
-//     ]
-// })
+const logOut = async () => {
+    loading.value = true;
+    const { error } = await supabase.auth.signOut()
+
+    if (error) {
+        console.log(error)
+        loading.value = false
+    } else {
+        return navigateTo('/')
+    }
+}
 
 </script>
 <style>
