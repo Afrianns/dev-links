@@ -38,8 +38,6 @@
                 class="absolute bottom-0 bg-white w-full h-16 rounded-b-md border-t border-gray-200 flex items-center justify-end">
                 <button class="bg- py-2 px-14 bg-blue-500 rounded-lg text-white mr-5 hover:bg-blue-600">Save</button>
             </div>
-            <button @click="store.getLinks">Click me</button>
-            {{ store.links }}
         </section>
     </div>
 </template>
@@ -47,13 +45,7 @@
 
 import { useLinksStore } from '../../store/LinksStore'
 
-definePageMeta({
-    layout: 'main'
-})
-
-
 const store = useLinksStore();
-
 
 type platformsDataType = {
     code: string,
@@ -76,6 +68,10 @@ type linkObj = {
 
 let idx = ref<number>(0);
 let listLinks = ref<linkObj[]>([]);
+
+definePageMeta({
+    layout: 'main'
+})
 
 const platforms: platformsType = {
     "PW": { code: "PW", name: "Person Website", icon: "mdi:earth", color: "bg-orange-500" },
@@ -118,6 +114,8 @@ const setLink = (link: string, index: number) => {
     store.links[index].link = link
 }
 
-</script>
+onMounted(() => {
+    store.getLinks();
+})
 
-<style scoped></style>
+</script>
