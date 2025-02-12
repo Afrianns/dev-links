@@ -15,7 +15,7 @@
 
                         <input type="file" name="avatar" id="avatar" v-on:change="getAvatar" hidden>
                         <div class="group bg-center w-full h-4/5 bg-cover rounded-md bg-no-repeat flex items-center relative overflow-hidden bg-gray-300"
-                            :style="'background-image: url(' + [profile.profileData ? profile.profileData : '/avatars/placeholder.png'] + ')'">
+                            :style="'background-image: url(' + [store.profile.profileData ? store.profile.profileData : '/avatars/placeholder.png'] + ')'">
                             <span class="bg-black/25 w-full h-full absolute group-hover:block hidden"></span>
                             <Icon name="lets-icons:img-box-fill"
                                 class="w-2/3 h-2/3 mx-auto bg-white group-hover:block hidden cursor-pointer" />
@@ -27,28 +27,39 @@
 
                 <div class="p-2 bg-gray-100 mt-3">
                     <form action="" method="post">
+                        <label for="url-name" class="block mt-3 text-sm font-medium">Url Name</label>
+                        <input v-model="urlName" name="url-name" id="url-name"
+                            placeholder="enter your url name or your display name" class="input-styles">
+
                         <label for="first-name" class="block mt-3 text-sm font-medium">First Name</label>
                         <input v-model="firstName" name="first-name" id="first-name" placeholder="enter your first name"
-                            class="bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            class="input-styles">
 
                         <label for="last-name" class="block mt-3 text-sm font-medium">Last Name</label>
                         <input v-model="lastName" name="last-name" id="last-name" placeholder="enter your last name"
-                            class="bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            class="input-styles">
 
                         <label for="email" class="block mt-3 text-sm font-medium">Email</label>
                         <input v-model="email" name="email" id="email" placeholder="enter your active email"
-                            class="bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            class="input-styles">
                     </form>
                 </div>
             </div>
             <div
                 class="absolute bottom-0 bg-white w-full h-16 rounded-b-md border-t border-gray-200 flex items-center justify-end">
                 <button class="bg- py-2 px-14 bg-blue-500 rounded-lg text-white mr-5 hover:bg-blue-600">Save</button>
+                <button @click="updateUser()">update url user</button>
             </div>
         </section>
     </div>
 </template>
 <script setup lang="ts">
+
+import { useLinksStore } from '~/store/LinksStore'
+const store = useLinksStore();
+const config = useRuntimeConfig();
+
+const supabase = useSupabaseClient()
 
 definePageMeta({
     layout: 'main'
@@ -56,31 +67,60 @@ definePageMeta({
 
 let avatar = ref('')
 
-import { useLinksStore } from '../../store/LinksStore'
-const { profile } = useLinksStore();
-
+let urlName = ref<string | undefined>('');
 let firstName = ref<string | undefined>('');
 let lastName = ref<string | undefined>('');
 let email = ref<string | undefined>('');
 
-onMounted(() => {
-    if (profile.firstName) firstName.value = profile.firstName
-    if (profile.lastName) lastName.value = profile.lastName
-    if (profile.email) email.value = profile.email
-})
+let profilePict = ref();
 
-// watch for individual profile data, 
+const updateUser = async () => {
+    console.log(profilePict.value, typeof profilePict)
+
+    if (profilePict.value) {
+        // https://slpkxwevtdtltxgcsqyl.supabase.co/storage/v1/object/public/Profile%20Pictures/avatars/avatar-user
+        const { data, error } = await supabase.storage.from('Profile Pictures').upload(`avatars/avatar_user${store.profile.id}`, profilePict.value)
+        if (error) {
+            // Handle error
+            console.log(error)
+        } else {
+
+            console.log(data.fullPath)
+            // Handle success
+        }
+    }
+    // if (urlName.value || email.value) {
+    //     const { data, error } = await supabase.auth.updateUser({
+    //         data: { username: urlName.value }
+    //     })
+
+    //     console.log(data, error)
+    // }
+}
+
+// watch for individual profile data,
 // make 3 watches for delete work when reach 1-0 letters of words otherwise data wont reactive
 
-watch(() => firstName.value, (firstName) => profile.firstName = firstName)
+watch(() => firstName.value, (firstName) => store.profile.firstName = firstName)
 
-watch(() => lastName.value, (lastName) => profile.lastName = lastName)
+watch(() => lastName.value, (lastName) => store.profile.lastName = lastName)
 
-watch(() => email.value, (email) => profile.email = email)
+watch(() => email.value, (email) => store.profile.email = email)
 
 
 const getAvatar = (a: any) => {
-    profile.profileData = URL.createObjectURL(a.target.files[0])
-    if (profile.profileData) avatar.value = profile.profileData
+    store.profile.profileData = URL.createObjectURL(a.target.files[0])
+    if (store.profile.profileData)
+        avatar.value = store.profile.profileData
+    profilePict.value = a.target.files[0];
 }
+
+onUpdated(() => {
+    if (store.profile.firstName) firstName.value = store.profile.firstName
+    if (store.profile.lastName) lastName.value = store.profile.lastName
+    if (store.profile.email) email.value = store.profile.email
+    if (store.profile.urlName) urlName.value = store.profile.urlName
+
+})
+
 </script>

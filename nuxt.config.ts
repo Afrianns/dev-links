@@ -29,6 +29,11 @@ export default defineNuxtConfig({
       ],
     },
   },
+  runtimeConfig: {
+    public: {
+      storageImagesUrl: "",
+    },
+  },
   supabase: {
     redirectOptions: {
       login: "/",
@@ -38,6 +43,7 @@ export default defineNuxtConfig({
       cookieRedirect: false,
     },
   },
+
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
   modules: [

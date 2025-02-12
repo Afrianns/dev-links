@@ -8,7 +8,8 @@
                 </svg>
                 Link #{{ index + 1 }}
             </h3>
-            <span v-on:click="$emit('remove-link', index)" class="cursor-pointer hover:underline">Remove</span>
+            <p>{{ uuid }}</p>
+            <span v-on:click="$emit('remove-link', index, uuid)" class="cursor-pointer hover:underline">Remove</span>
         </div>
 
         <div class="mt-5">
@@ -33,7 +34,7 @@ import { useLinksStore } from '~/store/LinksStore';
 
 const emit = defineEmits(['remove-link', 'platform', 'link'])
 
-let { index } = defineProps(['index'])
+let { index, uuid } = defineProps(['index', 'uuid'])
 
 const { links } = useLinksStore();
 
@@ -89,7 +90,7 @@ watch(link, async (newInput, _) => {
 })
 
 onMounted(() => {
-    console.log(index, links[index].code)
+    console.log(index, links[index].code, links)
 
     if (links[index].code) selected.value = links[index].code;
     if (links[index].link) link.value = links[index].link;
