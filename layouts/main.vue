@@ -44,11 +44,9 @@
                     </h2>
                 </nuxt-link>
             </div>
-            <div v-if="!checkParams(route.fullPath)">
-                <nuxt-link to="/links">
-                    <h2 class="blue-btn">Unpreview
-                    </h2>
-                </nuxt-link>
+            <div v-if="!checkParams(route.fullPath)" @click="$router.back()">
+                <h2 class="blue-btn">Unpreview
+                </h2>
             </div>
         </div>
     </nav>
@@ -58,7 +56,6 @@
 </template>
 <script setup lang="ts">
 import { useLinksStore } from '~/store/LinksStore'
-
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const store = useLinksStore();
@@ -85,8 +82,14 @@ const logOut = async () => {
 }
 
 onMounted(() => {
-    store.getLinks()
-    store.getUser()
+
+    console.log('from main', route.params.name)
+
+    if (!user.value && route?.params?.name) {
+        store.getUserNoAuth(route.params.name as string)
+    } else {
+        store.getAuthUser()
+    }
 })
 
 </script>

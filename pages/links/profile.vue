@@ -27,21 +27,27 @@
 
                 <div class="p-2 bg-gray-100 mt-3">
                     <form action="" method="post">
+
+
                         <label for="url-name" class="block mt-3 text-sm font-medium">Url Name</label>
                         <input v-model="urlName" name="url-name" id="url-name"
-                            placeholder="enter your url name or your display name" class="input-styles">
+                            placeholder="Enter your url name or your display name" class="input-styles mb-2"
+                            :class="{ 'bg-gray-50 border-gray-300': !urlNameError, 'bg-red-50 border-red-300 placeholder-red-500': urlNameError }">
 
+                        <span v-if="urlNameError" class="text-red-500 py-2">{{ urlNameError }}</span>
                         <label for="first-name" class="block mt-3 text-sm font-medium">First Name</label>
                         <input v-model="firstName" name="first-name" id="first-name" placeholder="enter your first name"
-                            class="input-styles">
+                            class="input-styles bg-gray-50 border-gray-300">
 
                         <label for="last-name" class="block mt-3 text-sm font-medium">Last Name</label>
                         <input v-model="lastName" name="last-name" id="last-name" placeholder="enter your last name"
-                            class="input-styles">
+                            class="input-styles bg-gray-50 border-gray-300">
 
                         <label for="email" class="block mt-3 text-sm font-medium">Email</label>
                         <input v-model="email" name="email" id="email" placeholder="enter your active email"
-                            class="input-styles">
+                            class="input-styles"
+                            :class="{ 'bg-gray-50 border-gray-300': !emailError, 'bg-red-50 border-red-300 text-red-500 placeholder-red-500': emailError }">
+                        <span v-if="emailError" class="text-red-500 py-2">{{ emailError }}</span>
                     </form>
                 </div>
             </div>
@@ -66,6 +72,7 @@ definePageMeta({
 })
 
 let avatar = ref('')
+const regexEmail = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'g')
 
 let urlName = ref<string | undefined>('');
 let firstName = ref<string | undefined>('');
@@ -74,29 +81,65 @@ let email = ref<string | undefined>('');
 
 let profilePict = ref();
 
+let urlNameError = ref('')
+let emailError = ref('')
+
+
 const updateUser = async () => {
     console.log(profilePict.value, typeof profilePict)
 
     if (profilePict.value) {
         // https://slpkxwevtdtltxgcsqyl.supabase.co/storage/v1/object/public/Profile%20Pictures/avatars/avatar-user
-        const { data, error } = await supabase.storage.from('Profile Pictures').upload(`avatars/avatar_user${store.profile.id}`, profilePict.value)
+        // const { data, error } = await supabase.storage.from('Profile Pictures').upload(`avatars/avatar_user${store.profile.id}`, profilePict.value)
+
+        const { data, error } = await supabase
+            .storage
+            .from('Profile Pictures')
+            .update(`avatars/avatar_user${store.profile.id}`, profilePict.value, {
+                cacheControl: '30',
+                upsert: true
+            })
+
         if (error) {
             // Handle error
             console.log(error)
         } else {
-
-            console.log(data.fullPath)
             // Handle success
+            console.log(data.fullPath)
         }
     }
-    // if (urlName.value || email.value) {
-    //     const { data, error } = await supabase.auth.updateUser({
-    //         data: { username: urlName.value }
-    //     })
+    // Validate Email and Url Name 
 
-    //     console.log(data, error)
-    // }
+    if (!urlName.value) {
+        urlNameError.value = "Url name cannot be empty!"
+        return
+    }
+
+    if (!email.value) {
+        emailError.value = "Email cannot be empty!"
+        return
+    }
+
+    if (!regexEmail.test(email.value)) {
+        emailError.value = "Email is not valid!"
+        return
+    }
+
+    // update new user data
+
+    const { data, error } = await supabase.auth.updateUser({
+        email: email.value,
+        data: {
+            email: email.value,
+            username: urlName.value,
+            first_name: firstName.value,
+            last_name: lastName.value,
+        }
+    })
+
+    console.log(data, error)
 }
+
 
 // watch for individual profile data,
 // make 3 watches for delete work when reach 1-0 letters of words otherwise data wont reactive
@@ -107,6 +150,8 @@ watch(() => lastName.value, (lastName) => store.profile.lastName = lastName)
 
 watch(() => email.value, (email) => store.profile.email = email)
 
+watch(() => urlName.value, (urlName) => store.profile.urlName = urlName)
+
 
 const getAvatar = (a: any) => {
     store.profile.profileData = URL.createObjectURL(a.target.files[0])
@@ -116,10 +161,10 @@ const getAvatar = (a: any) => {
 }
 
 onUpdated(() => {
+    if (store.profile.urlName) urlName.value = store.profile.urlName
     if (store.profile.firstName) firstName.value = store.profile.firstName
     if (store.profile.lastName) lastName.value = store.profile.lastName
     if (store.profile.email) email.value = store.profile.email
-    if (store.profile.urlName) urlName.value = store.profile.urlName
 
 })
 

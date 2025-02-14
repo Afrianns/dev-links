@@ -15,6 +15,8 @@ const props = ref({
     width: "4rem",
     gap: ".2rem",
     placeholderHeight: ".75rem",
+    marginTop: '.75rem',
+    nameStyles: false
 })
 const store = useLinksStore();
 

@@ -6,15 +6,16 @@
                 :class="[profile.profileData ? '' : 'animate-pulse']">
             </div>
         </section>
-        <section>
+        <section class="leading-3" :style="'margin-top: ' + props.marginTop">
             <p v-if="!profile.firstName && !profile.lastName"
                 class="px-5 bg-gray-300 w-1/2 rounded-md mt-3 mx-auto animate-pulse"
                 :style="'height: ' + props.placeholderHeight">
             </p>
-            <h2 class="text-md text-gray-700 mx-auto w-fit" v-if="profile.firstName || profile.lastName"> {{
-                profile.firstName
+            <h1 class="text-md text-gray-700 mx-auto w-fit" :class="{ 'text-2xl font-semibold': props.nameStyles }"
+                v-if="profile.firstName || profile.lastName"> {{
+                    profile.firstName
                 }} {{ profile.lastName }}
-            </h2>
+            </h1>
         </section>
         <section>
             <p v-if="!profile.email" class="px-5 bg-gray-300 w-1/3 rounded-md mt-2 mx-auto animate-pulse"

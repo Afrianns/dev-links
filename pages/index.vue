@@ -82,9 +82,3 @@ const authLogin = () => {
 }
 
 </script>
-
-<style>
-* {
-    text-decoration: none;
-}
-</style>

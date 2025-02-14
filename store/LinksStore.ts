@@ -18,14 +18,16 @@ export const useLinksStore = defineStore("links", {
       const { data } = await supabase
         .from("Links")
         .select()
+        .eq("user_id", this.profile.id)
         .returns<linksType[]>();
 
+      console.log(data);
       if (data) {
         this.links = data;
       }
     },
 
-    async getUser() {
+    async getAuthUser() {
       const supabase = useSupabaseClient();
 
       let { data } = await supabase.auth.getUser();
@@ -36,11 +38,44 @@ export const useLinksStore = defineStore("links", {
           id: data.user.id,
           firstName: "",
           lastName: "",
-          email: data.user.email,
+          email: data.user.user_metadata.email,
           urlName: data.user.user_metadata.username,
         };
 
+        this.getLinks();
         this.getAvatar();
+      }
+    },
+
+    async getUserNoAuth(username: string) {
+      const supabase = useSupabaseClient<Database>();
+      const { data, error } = await supabase
+        .from("users_details")
+        .select()
+        .eq("username", username)
+        .single();
+
+      if (data) {
+        this.profile = {
+          id: data.id,
+          firstName: "",
+          lastName: "",
+          email: data.email,
+          urlName: data.username,
+        };
+
+        this.getAvatar();
+        console.log(data);
+      }
+
+      if (error) {
+        console.log(error);
+        throw showError({
+          statusCode: 404,
+          statusMessage: "Page Not Found",
+          message: error.details,
+          data: username,
+        });
       }
     },
 
@@ -60,28 +95,21 @@ export const useLinksStore = defineStore("links", {
 });
 
 interface linksType {
-  code?: string | null;
-  color?: string | null;
-  created_at?: string | null;
-  icon?: string | null;
   id?: string;
-  link?: string | null;
-  platform?: string | null;
   user_id?: string;
+  code?: string;
+  icon?: string;
+  link?: string;
+  color?: string;
+  platform?: string;
+  created_at?: string;
 }
 
 interface profileDetailType {
   id: string;
-  urlName?: string;
-  profileData?: string;
+  email?: string;
   firstName?: string;
   lastName?: string;
-  email?: string;
-}
-
-interface runtimeConfigType {
-  public: {
-    apiKey: string;
-    projectUrl: string;
-  };
+  urlName?: string;
+  profileData?: string;
 }
