@@ -10,6 +10,8 @@ import { useLinksStore } from '~/store/LinksStore';
 const store = useLinksStore()
 const previewPage = ref(true)
 
+const route = useRoute()
+
 definePageMeta({
     layout: 'main'
 })
@@ -21,5 +23,4 @@ const props = ref({
     marginTop: '1.2rem',
     nameStyles: true
 })
-
 </script>

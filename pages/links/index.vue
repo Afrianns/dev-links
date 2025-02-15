@@ -1,7 +1,7 @@
 <template>
-    <div class="flex justify-center w-[1000px] mx-auto mb-10">
-        <preview />
-        <section class="w-2/3 bg-white h-[600px] rounded-md py-3 border border-slate-200 shadow-sm ml-5 relative">
+    <div class="flex justify-center md:w-[1000px] mx-auto mb-10">
+        <preview class="hidden md:block" />
+        <section class="md:w-2/3 bg-white h-[600px] rounded-md py-3 border border-slate-200 shadow-sm md:ml-5 relative">
             <div class="p-3 mx-2">
                 <div class="my-3 mb-7">
                     <h2 class="font-semibold text-xl">
@@ -9,7 +9,7 @@
                     </h2>
                     <p class="text-gray-500">Add/Remove/Edit links all you want and showcase to everyone!</p>
                 </div>
-                <button v-on:click="addNewLink"
+                <button v-on:click="addNewLink" v-if="store.links.length < max"
                     class="w-full blue-btn flex justify-center items-center font-semibold py-3">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                         <path fill="currentColor"
@@ -50,7 +50,8 @@
 </template>
 <script setup lang="ts">
 
-import type { Database } from '~/types/supabase'
+import type { Database } from '~/types/supabase';
+
 import { useLinksStore } from '~/store/LinksStore'
 
 type platformsDataType = {
@@ -65,14 +66,14 @@ type platformsType = {
 }
 
 interface linksType {
-    code?: string | null;
-    color?: string | null;
-    created_at?: string | null;
-    icon?: string | null;
     id?: string;
-    link?: string | null;
-    platform?: string | null;
     user_id?: string;
+    code?: string;
+    icon?: string;
+    link?: string;
+    color?: string;
+    platform?: string;
+    created_at?: string;
 }
 
 const store = useLinksStore()
@@ -85,8 +86,8 @@ const saveLoading = ref(false)
 const errorMessage = ref('there is an testing')
 const isError = ref(false)
 
-// let idx = ref<number>(0);
-// let listLinks = ref<linkObj[]>([]);
+const max = 5;
+
 
 definePageMeta({
     layout: 'main'

@@ -1,7 +1,12 @@
 <template>
-    <div class="flex justify-center w-[1000px] mx-auto mb-10">
-        <preview />
-        <section class="w-2/3 bg-white h-[600px] rounded-md py-3 border border-slate-200 shadow-sm ml-5 relative">
+    <div :class="{ '-top-20': !confirmEmailNotif, 'top-5': confirmEmailNotif }"
+        class="transition-all delay-150 duration-300 ease-in-out bg-green-50 text-green-800 py-2 px-4 border-2 border-teal-500 shadow-green-200 rounded-xl shadow-md z-10 fixed left-1/2 transform -translate-x-1/2 flex gap-x-2 items-center">
+        <Icon name="gg:check-o" size="20" class="bg-green-700 font-bold" />
+        <h1>Email confirmation has sent!</h1>
+    </div>
+    <div class="flex justify-center md:w-[1000px] mx-auto mb-10">
+        <preview class="hidden md:block" />
+        <section class="md:w-2/3 bg-white h-[600px] rounded-md py-3 border border-slate-200 shadow-sm md:ml-5 relative">
             <div class="p-3 mx-2 pb-20 overflow-y-auto h-full">
                 <div class="my-3 mb-7">
                     <h2 class="font-semibold text-xl">
@@ -28,7 +33,6 @@
                 <div class="p-2 bg-gray-100 mt-3">
                     <form action="" method="post">
 
-
                         <label for="url-name" class="block mt-3 text-sm font-medium">Url Name</label>
                         <input v-model="urlName" name="url-name" id="url-name"
                             placeholder="Enter your url name or your display name" class="input-styles mb-2"
@@ -48,13 +52,22 @@
                             class="input-styles"
                             :class="{ 'bg-gray-50 border-gray-300': !emailError, 'bg-red-50 border-red-300 text-red-500 placeholder-red-500': emailError }">
                         <span v-if="emailError" class="text-red-500 py-2">{{ emailError }}</span>
+                        <span class="text-sm font-light">Email need confirmation to change</span>
                     </form>
                 </div>
             </div>
             <div
                 class="absolute bottom-0 bg-white w-full h-16 rounded-b-md border-t border-gray-200 flex items-center justify-end">
-                <button class="bg- py-2 px-14 bg-blue-500 rounded-lg text-white mr-5 hover:bg-blue-600">Save</button>
-                <button @click="updateUser()">update url user</button>
+                <p v-if="errorUpdated"
+                    class="mr-5 text-red-700 font-medium flex items-center gap-x-2 bg-red-50 rounded-2xl py-1 px-2 ">
+                    <Icon name="rivet-icons:exclamation-mark-circle" size="20" /> {{ errorUpdated }}
+                </p>
+                <button v-if="!saveProfileLoading" @click="updateUser()"
+                    class="bg- py-2 px-14 bg-blue-500 rounded-lg text-white mr-5 hover:bg-blue-600">Save</button>
+                <span v-if="saveProfileLoading"
+                    class="bg- py-2 px-14 bg-blue-500 rounded-lg text-white mr-5 hover:bg-blue-600 flex">
+                    <Icon name="line-md:loading-twotone-loop" size="24" class="bg-white" />
+                </span>
             </div>
         </section>
     </div>
@@ -62,9 +75,7 @@
 <script setup lang="ts">
 
 import { useLinksStore } from '~/store/LinksStore'
-const store = useLinksStore();
-const config = useRuntimeConfig();
-
+const store = useLinksStore()
 const supabase = useSupabaseClient()
 
 definePageMeta({
@@ -72,21 +83,27 @@ definePageMeta({
 })
 
 let avatar = ref('')
-const regexEmail = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'g')
 
-let urlName = ref<string | undefined>('');
-let firstName = ref<string | undefined>('');
-let lastName = ref<string | undefined>('');
-let email = ref<string | undefined>('');
+let urlName = ref<string | undefined>('')
+let firstName = ref<string | null>('')
+let lastName = ref<string | null>('')
+let email = ref<string | undefined>('')
 
-let profilePict = ref();
+let profilePict = ref()
 
 let urlNameError = ref('')
 let emailError = ref('')
 
+let errorUpdated = ref('')
+
+let confirmEmailNotif = ref(false)
+
+let saveProfileLoading = ref(false)
 
 const updateUser = async () => {
     console.log(profilePict.value, typeof profilePict)
+    const regexEmail = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'g')
+    saveProfileLoading.value = true;
 
     if (profilePict.value) {
         // https://slpkxwevtdtltxgcsqyl.supabase.co/storage/v1/object/public/Profile%20Pictures/avatars/avatar-user
@@ -101,30 +118,29 @@ const updateUser = async () => {
             })
 
         if (error) {
-            // Handle error
-            console.log(error)
-        } else {
-            // Handle success
-            console.log(data.fullPath)
+            saveProfileLoading.value = false
+            return
         }
     }
-    // Validate Email and Url Name 
 
+    // Validate Email and Url Name 
     if (!urlName.value) {
         urlNameError.value = "Url name cannot be empty!"
+        saveProfileLoading.value = false
         return
     }
 
     if (!email.value) {
         emailError.value = "Email cannot be empty!"
+        saveProfileLoading.value = false
         return
-    }
-
-    if (!regexEmail.test(email.value)) {
+    } else if (!regexEmail.test(email.value)) {
         emailError.value = "Email is not valid!"
+        saveProfileLoading.value = false
         return
     }
 
+    console.log(email.value)
     // update new user data
 
     const { data, error } = await supabase.auth.updateUser({
@@ -137,9 +153,22 @@ const updateUser = async () => {
         }
     })
 
-    console.log(data, error)
-}
+    if (data.user && store.profile.email != email.value) {
+        confirmEmailNotif.value = true;
+        setTimeout(() => confirmEmailNotif.value = false, 3400);
+    }
 
+    console.log(data, error)
+
+    if (error) {
+        console.log(error.message)
+        errorUpdated.value = error.message
+    }
+    urlNameError.value = ''
+    emailError.value = ''
+
+    saveProfileLoading.value = false
+}
 
 // watch for individual profile data,
 // make 3 watches for delete work when reach 1-0 letters of words otherwise data wont reactive

@@ -1,9 +1,9 @@
 <template>
-
     <nav v-if="user"
-        class="flex justify-between bg-white mx-auto py-5 px-10 rounded-md my-5 w-[1000px] border border-slate-200 shadow-sm items-center text-gray-700">
-        <h1 class="flex items-center gap-3 font-bold text-blue-950"> <svg class="bg-blue-200 py-1 px-2 rounded-lg"
-                xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 20 20">
+        class="flex justify-between bg-white mx-3 md:mx-auto py-4 px-5 rounded-md my-5 md:w-[1000px] border border-slate-200 shadow-sm items-center text-gray-700 relative">
+        <h1 class="hidden sm:flex items-center gap-3 font-bold text-blue-950"> <svg
+                class="bg-blue-200 py-1 px-2 rounded-lg" xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+                viewBox="0 0 20 20">
                 <path fill="blue"
                     d="M17.74 2.76a4.32 4.32 0 0 1 0 6.1l-1.53 1.52c-1.12 1.12-2.7 1.47-4.14 1.09l2.62-2.61l.76-.77l.76-.76c.84-.84.84-2.2 0-3.04a2.13 2.13 0 0 0-3.04 0l-.77.76l-3.38 3.38c-.37-1.44-.02-3.02 1.1-4.14l1.52-1.53a4.32 4.32 0 0 1 6.1 0M8.59 13.43l5.34-5.34c.42-.42.42-1.1 0-1.52c-.44-.43-1.13-.39-1.53 0l-5.33 5.34c-.42.42-.42 1.1 0 1.52c.44.43 1.13.39 1.52 0m-.76 2.29l4.14-4.15c.38 1.44.03 3.02-1.09 4.14l-1.52 1.53a4.32 4.32 0 0 1-6.1 0a4.32 4.32 0 0 1 0-6.1l1.53-1.52c1.12-1.12 2.7-1.47 4.14-1.1l-4.14 4.15c-.85.84-.85 2.2 0 3.05c.84.84 2.2.84 3.04 0" />
             </svg> Dev Links</h1>
@@ -28,63 +28,35 @@
                 </nuxt-link>
             </li>
         </ul>
-        <div class="flex gap-x-2">
-            <div v-if="!loading" @click="logOut">
-                <h2 class="red-btn">Logout
-                </h2>
-            </div>
-            <div v-if="loading">
-                <h2 class="red-btn opacity-55 flex items-center justify-center">
-                    <Icon name="line-md:loading-twotone-loop" size="1.5rem" />
-                </h2>
-            </div>
-            <div v-if="checkParams(route.fullPath)">
-                <nuxt-link to="/jack">
-                    <h2 class="blue-btn">Preview
-                    </h2>
-                </nuxt-link>
-            </div>
-            <div v-if="!checkParams(route.fullPath)" @click="$router.back()">
-                <h2 class="blue-btn">Unpreview
-                </h2>
-            </div>
+        <div @click="hideMenu = !hideMenu"
+            class="md:hidden flex hover:bg-blue-50 p-1 rounded-md group cursor-pointer max-sm:ml-auto"
+            :class="{ 'bg-blue-50': !hideMenu }">
+            <Icon name="gg:menu-right" size="1.5rem" class="group-hover:bg-blue-500"
+                :class="{ 'bg-blue-500': !hideMenu }" />
         </div>
+        <menuRightNav :class="{ 'hidden': hideMenu }" class="drop-menu-styles md:hidden flex flex-col gap-y-2" />
+        <menuRightNav class="hidden md:flex gap-x-2" />
     </nav>
-    <main>
+    <main class="mx-3 md:mx-0">
         <slot />
     </main>
 </template>
 <script setup lang="ts">
 import { useLinksStore } from '~/store/LinksStore'
-const supabase = useSupabaseClient()
+
+const store = useLinksStore()
+
 const user = useSupabaseUser()
-const store = useLinksStore();
 const route = useRoute()
 
-const loading = ref(false)
+let hideMenu = ref(true)
 
 const checkParams = (path: string) => {
     const regexp = new RegExp(/(^\/links\/$)|(^\/links$)|(^\/links\/profile(\/|)$)/, 'g')
-
     return (regexp.test(path))
 }
 
-const logOut = async () => {
-    loading.value = true;
-    const { error } = await supabase.auth.signOut()
-
-    if (error) {
-        console.log(error)
-        loading.value = false
-    } else {
-        return navigateTo('/')
-    }
-}
-
 onMounted(() => {
-
-    console.log('from main', route.params.name)
-
     if (!user.value && route?.params?.name) {
         store.getUserNoAuth(route.params.name as string)
     } else {

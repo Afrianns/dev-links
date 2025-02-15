@@ -23,8 +23,10 @@
                 </select>
 
                 <label for="link" class="block mt-3 text-sm font-medium">Link</label>
-                <input v-model="link" type="url" name="link" id="link" placeholder="Write the correct url"
+                <input v-model="link" type="url" name="link" id="link"
+                    placeholder="Write the correct url, e.g. https://example.com"
                     class="bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                <span class="mt-3 text-red-500" v-if="validURLMessage">{{ validURLMessage }}</span>
             </form>
         </div>
     </div>
@@ -38,14 +40,12 @@ let { index, uuid } = defineProps(['index', 'uuid'])
 
 const { links } = useLinksStore();
 
-let config = useRuntimeConfig()
-
 let selected = ref<string>('default');
 let link = ref('');
 
-interface reversePlatformsType {
-    [key: string]: { name: string }
-}
+const regexValidURL = new RegExp(/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/, 'ig')
+
+let validURLMessage = ref("")
 
 const platforms = [
     {
@@ -70,15 +70,6 @@ const platforms = [
     }
 ];
 
-const reversePlatforms: reversePlatformsType = {
-    "Person Website": { name: "PW" },
-    "Github": { name: "GH" },
-    "Codewars": { name: "CW" },
-    "Leetcode": { name: "LC" },
-    "Hackerrank": { name: "HR" },
-    "Undefined": { name: "Default" }
-}
-
 
 watch(selected, async (newPlatform, _) => {
     emit('platform', newPlatform, index);
@@ -86,8 +77,12 @@ watch(selected, async (newPlatform, _) => {
 
 
 watch(link, async (newInput, _) => {
-    emit('link', newInput, index);
+
+    validURLMessage.value = (regexValidURL.test(link.value)) ? '' : "Url is not valid"
+    if (regexValidURL.test(newInput)) emit('link', newInput, index);
+
 })
+
 
 onMounted(() => {
     console.log(index, links[index].code, links)

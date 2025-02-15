@@ -36,8 +36,8 @@ export const useLinksStore = defineStore("links", {
       if (data.user) {
         this.profile = {
           id: data.user.id,
-          firstName: "",
-          lastName: "",
+          firstName: data.user.user_metadata.first_name,
+          lastName: data.user.user_metadata.last_name,
           email: data.user.user_metadata.email,
           urlName: data.user.user_metadata.username,
         };
@@ -58,8 +58,8 @@ export const useLinksStore = defineStore("links", {
       if (data) {
         this.profile = {
           id: data.id,
-          firstName: "",
-          lastName: "",
+          firstName: data.first_name,
+          lastName: data.last_name,
           email: data.email,
           urlName: data.username,
         };
@@ -108,8 +108,8 @@ interface linksType {
 interface profileDetailType {
   id: string;
   email?: string;
-  firstName?: string;
-  lastName?: string;
+  firstName: string | null;
+  lastName: string | null;
   urlName?: string;
   profileData?: string;
 }
