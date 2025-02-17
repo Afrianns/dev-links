@@ -10,7 +10,10 @@
 <script setup lang="ts">
 import { useLinksStore } from '~/store/LinksStore';
 
+// for editing page preview (not public accessed by anyone)
 const previewPage = ref(false)
+
+// setting for reuseable component "previewComp"
 const props = ref({
     width: "4rem",
     gap: ".2rem",

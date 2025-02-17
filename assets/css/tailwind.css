@@ -7,6 +7,10 @@
   --font-red-hat: "Red Hat", sans-serif;
 } */
 
+body {
+  @apply bg-gray-100;
+}
+
 @theme {
   --breakpoint-md: 1080px;
 }

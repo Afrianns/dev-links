@@ -9,7 +9,7 @@
                 <Icon name="line-md:loading-twotone-loop" size="1.5rem" />
             </h2>
         </div>
-        <!-- feature loading when profile urlname undefined (new) -->
+        <!-- feature loading by flip if in preview page or in editor -->
         <div v-if="checkParams(route.fullPath)" @click="previewLink()">
             <h2 class="blue-btn">Preview
             </h2>
@@ -35,6 +35,7 @@ const checkParams = (path: string) => {
     return (regexp.test(path))
 }
 
+// func to logout current user
 const logOut = async () => {
     loading.value = true;
     const { error } = await supabase.auth.signOut()
@@ -46,7 +47,7 @@ const logOut = async () => {
         return navigateTo('/')
     }
 }
-
+// func to preview current link with "urlname" and to get current url name so it match with url
 const previewLink = () => {
     const route = '/' + store.profile.urlName
 

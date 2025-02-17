@@ -51,12 +51,17 @@ const route = useRoute()
 
 let hideMenu = ref(true)
 
+// regex for testing current route match (ur: links, url: links/profile)
 const checkParams = (path: string) => {
     const regexp = new RegExp(/(^\/links\/$)|(^\/links$)|(^\/links\/profile(\/|)$)/, 'g')
     return (regexp.test(path))
 }
 
 onMounted(() => {
+    
+    // if not auth and there is a parameter then call pinia store get func with no auth required
+    // otherwise use auth required func
+
     if (!user.value && route?.params?.name) {
         store.getUserNoAuth(route.params.name as string)
     } else {
@@ -68,10 +73,8 @@ onMounted(() => {
 <style>
 body {
     font-family: "Red Hat Text", serif;
-    background: rgb(234, 236, 241);
     display: flex;
     justify-content: center;
-    /* align-items: center; */
     min-height: 100vh;
 }
 </style>

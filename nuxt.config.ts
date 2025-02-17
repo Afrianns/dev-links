@@ -2,6 +2,7 @@
 export default defineNuxtConfig({
   app: {
     head: {
+      title: "Developer Links",
       meta: [
         {
           name: "viewport",
@@ -24,6 +25,11 @@ export default defineNuxtConfig({
         {
           rel: "stylesheet",
           href: "https://fonts.googleapis.com/css2?family=Red+Hat+Text:ital,wght@0,300..700;1,300..700&display=swap",
+        },
+        {
+          rel: "icon",
+          type: "image/png",
+          href: "/favicon.svg",
         },
       ],
     },

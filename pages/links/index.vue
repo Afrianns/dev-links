@@ -26,7 +26,7 @@
 
                     <div class="py-10" v-if="store.links.length <= 0">
                         <img src="assets/vectors/no-data.svg" class="w-1/4 mx-auto" alt="no data flat illustration">
-                        <h3 class="text-center mt-5 text-gray-500">There is no Links Provided</h3>
+                        <h3 class="text-center mt-5 text-gray-500">There are no links provided</h3>
                     </div>
                 </div>
             </div>
@@ -67,11 +67,11 @@ type platformsType = {
 
 interface linksType {
     id?: string;
-    user_id?: string;
+    user_id: string;
     code?: string;
     icon?: string;
     link?: string;
-    color?: string;
+    color: string;
     platform?: string;
     created_at?: string;
 }
@@ -80,7 +80,7 @@ const store = useLinksStore()
 
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
-const userId = ref<string | undefined>("")
+const userId = ref<string>("")
 
 const saveLoading = ref(false)
 const errorMessage = ref('there is an testing')
@@ -92,7 +92,7 @@ const max = 5;
 definePageMeta({
     layout: 'main'
 })
-
+// placeholder for different platform style 
 const platforms: platformsType = {
     "PW": { code: "PW", name: "Person Website", icon: "mdi:earth", color: "bg-orange-500" },
     "GH": { code: "GH", name: "Github", icon: "mdi:github", color: "bg-gray-500" },
@@ -101,7 +101,7 @@ const platforms: platformsType = {
     "HR": { code: "HR", name: "Hackerrank", icon: "cib:hackerrank", color: "bg-emerald-500" },
 }
 
-// simple-icons:frontendmentor
+// remove single link on db and/or pinia store 
 const removeLink = async (index: number, uuid: string) => {
     store.links.splice(index, 1);
 
@@ -111,19 +111,21 @@ const removeLink = async (index: number, uuid: string) => {
             .delete()
             .eq('id', uuid)
 
-        console.log(response)
+        if (response) {
+            console.log("success")
+        }
     }
 
 }
-
+// Add new starter new link with user uuid and default beckground color 
 const addNewLink = () => {
     store.links.push({
         "user_id": userId.value,
         "color": "bg-gray-300",
     });
-    console.log(store.links)
 }
 
+// update current link with pinia store
 const setUpdateLink = (platform: string, index: number) => {
     if (platform != 'default') {
         store.links[index].platform = platforms[platform].name
@@ -137,14 +139,16 @@ const setUpdateLink = (platform: string, index: number) => {
         delete store.links[index].icon
     }
 }
-
+// store url link to pinia store 
 const setLink = (link: string, index: number) => {
     store.links[index].link = link
 }
 
+// save all links update and/or insert to DB and update pinia store(so its matched)
 const saveData = async () => {
+
     saveLoading.value = true
-    console.log(userId.value, store.links)
+
     const { data, error } = await supabase
         .from('Links')
         .upsert(store.links, { defaultToNull: false })
@@ -161,10 +165,15 @@ const saveData = async () => {
     saveLoading.value = false
 }
 
-
+// get current user uuid data(auth required)
+// for placeholder "add new link" function above
+// and redirected, if uuid not exist 
 onMounted(() => {
-    userId.value = user.value?.id;
-    console.log(typeof user.value?.id, typeof userId.value)
+    if (user.value?.id) {
+        userId.value = user.value.id;
+    } else {
+        navigateTo('/register');
+    }
 })
 
 </script>

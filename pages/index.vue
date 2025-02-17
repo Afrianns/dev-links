@@ -50,6 +50,7 @@ definePageMeta({
     layout: 'frontpage'
 })
 
+// Function login with email n password
 const getUser = async () => {
 
     try {
@@ -76,7 +77,6 @@ const getUser = async () => {
 }
 
 const authLogin = () => {
-    console.log(email.value, password.value);
     loading.value = true;
     getUser()
 }

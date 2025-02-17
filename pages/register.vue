@@ -58,6 +58,7 @@ const errorMessage = ref("There is an error occurs")
 const isError = ref(false)
 const loading = ref(false)
 
+// function registering current user data
 const registerUser = async () => {
 
     if (password.value !== repeatedPassword.value) {
@@ -80,8 +81,6 @@ const registerUser = async () => {
             }
         }
     )
-
-    console.log(user, user.error?.message)
 
     if (user.error) {
         errorMessage.value = (user.error?.message == 'Database error saving new user') ? `Username ${username.value} already been used!` : user.error?.message

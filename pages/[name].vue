@@ -10,12 +10,11 @@ import { useLinksStore } from '~/store/LinksStore';
 const store = useLinksStore()
 const previewPage = ref(true)
 
-const route = useRoute()
-
 definePageMeta({
     layout: 'main'
 })
 
+// setting for reuseable component "previewComp" 
 const props = ref({
     width: "6rem",
     placeholderHeight: "1rem",

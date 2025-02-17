@@ -12,6 +12,7 @@ export const useLinksStore = defineStore("links", {
   },
 
   actions: {
+    // get all links from DB supabase(func dont need auth)
     async getLinks() {
       const supabase = useSupabaseClient<Database>();
 
@@ -21,18 +22,17 @@ export const useLinksStore = defineStore("links", {
         .eq("user_id", this.profile.id)
         .returns<linksType[]>();
 
-      console.log(data);
       if (data) {
         this.links = data;
       }
     },
 
+    // get current user data from supabase(func need auth user)
     async getAuthUser() {
       const supabase = useSupabaseClient();
 
       let { data } = await supabase.auth.getUser();
 
-      console.log(data);
       if (data.user) {
         this.profile = {
           id: data.user.id,
@@ -47,8 +47,10 @@ export const useLinksStore = defineStore("links", {
       }
     },
 
+    // get current user data from supabase(func don't need auth user)
     async getUserNoAuth(username: string) {
       const supabase = useSupabaseClient<Database>();
+
       const { data, error } = await supabase
         .from("users_details")
         .select()
@@ -65,11 +67,10 @@ export const useLinksStore = defineStore("links", {
         };
 
         this.getAvatar();
-        console.log(data);
+        this.getLinks();
       }
-
+      // if error/not found user kick user to 404 page 
       if (error) {
-        console.log(error);
         throw showError({
           statusCode: 404,
           statusMessage: "Page Not Found",
@@ -79,6 +80,7 @@ export const useLinksStore = defineStore("links", {
       }
     },
 
+    // get current user avatar link and check if it exist or not(func need auth user) 
     async getAvatar() {
       const config = useRuntimeConfig();
       const supabase = useSupabaseClient();
@@ -90,17 +92,21 @@ export const useLinksStore = defineStore("links", {
       if (data)
         this.profile.profileData =
           config.public.storageImagesUrl + this.profile.id;
+
+      if (error) {
+        console.log(error);
+      }
     },
   },
 });
 
 interface linksType {
   id?: string;
-  user_id?: string;
+  user_id: string;
   code?: string;
   icon?: string;
   link?: string;
-  color?: string;
+  color: string;
   platform?: string;
   created_at?: string;
 }

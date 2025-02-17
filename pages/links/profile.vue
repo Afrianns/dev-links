@@ -51,8 +51,8 @@
                         <input v-model="email" name="email" id="email" placeholder="enter your active email"
                             class="input-styles"
                             :class="{ 'bg-gray-50 border-gray-300': !emailError, 'bg-red-50 border-red-300 text-red-500 placeholder-red-500': emailError }">
-                        <span v-if="emailError" class="text-red-500 py-2">{{ emailError }}</span>
                         <span class="text-sm font-light">Email need confirmation to change</span>
+                        <span v-if="emailError" class="text-red-500 py-2">{{ emailError }}</span><br>
                     </form>
                 </div>
             </div>
@@ -97,19 +97,18 @@ let emailError = ref('')
 let errorUpdated = ref('')
 
 let confirmEmailNotif = ref(false)
-
 let saveProfileLoading = ref(false)
 
+// update current auth user w/ avatar uploading
 const updateUser = async () => {
-    console.log(profilePict.value, typeof profilePict)
+    // regex check email is valid or not
     const regexEmail = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'g')
+
+    // start for loading boolean
     saveProfileLoading.value = true;
 
     if (profilePict.value) {
-        // https://slpkxwevtdtltxgcsqyl.supabase.co/storage/v1/object/public/Profile%20Pictures/avatars/avatar-user
-        // const { data, error } = await supabase.storage.from('Profile Pictures').upload(`avatars/avatar_user${store.profile.id}`, profilePict.value)
-
-        const { data, error } = await supabase
+        const { error } = await supabase
             .storage
             .from('Profile Pictures')
             .update(`avatars/avatar_user${store.profile.id}`, profilePict.value, {
@@ -123,13 +122,13 @@ const updateUser = async () => {
         }
     }
 
-    // Validate Email and Url Name 
+    // Validate Url Name 
     if (!urlName.value) {
         urlNameError.value = "Url name cannot be empty!"
         saveProfileLoading.value = false
         return
     }
-
+    // validate email is empty or not, and if is valid or not
     if (!email.value) {
         emailError.value = "Email cannot be empty!"
         saveProfileLoading.value = false
@@ -140,9 +139,9 @@ const updateUser = async () => {
         return
     }
 
-    console.log(email.value)
+    // if pass everthing above then
     // update new user data
-
+    // first name and last name doesn't need to be filled nor validated
     const { data, error } = await supabase.auth.updateUser({
         email: email.value,
         data: {
@@ -153,17 +152,17 @@ const updateUser = async () => {
         }
     })
 
+    // if success update user and is email is getting update then show notif on the page
     if (data.user && store.profile.email != email.value) {
         confirmEmailNotif.value = true;
         setTimeout(() => confirmEmailNotif.value = false, 3400);
     }
 
-    console.log(data, error)
-
     if (error) {
         console.log(error.message)
         errorUpdated.value = error.message
     }
+    // reset error infos for url and email
     urlNameError.value = ''
     emailError.value = ''
 
@@ -181,7 +180,7 @@ watch(() => email.value, (email) => store.profile.email = email)
 
 watch(() => urlName.value, (urlName) => store.profile.urlName = urlName)
 
-
+// get temp user avatar and create object url from blob
 const getAvatar = (a: any) => {
     store.profile.profileData = URL.createObjectURL(a.target.files[0])
     if (store.profile.profileData)
@@ -189,6 +188,7 @@ const getAvatar = (a: any) => {
     profilePict.value = a.target.files[0];
 }
 
+// initalized all pinia store data if exist
 onUpdated(() => {
     if (store.profile.urlName) urlName.value = store.profile.urlName
     if (store.profile.firstName) firstName.value = store.profile.firstName
@@ -196,5 +196,4 @@ onUpdated(() => {
     if (store.profile.email) email.value = store.profile.email
 
 })
-
 </script>
