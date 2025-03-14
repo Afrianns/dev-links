@@ -160,8 +160,9 @@ const updateUser = async () => {
     })
 
     // if success update user and is email is getting update then show notif on the page
-    if (data.user && store.profile.email != email.value) {
+    if (data.user && data.user.email != email.value) {
         confirmEmailNotif.value = true;
+        console.log(data)
         setTimeout(() => confirmEmailNotif.value = false, 3400);
     }
 
