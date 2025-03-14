@@ -20,7 +20,7 @@ body {
 }
 
 .url-link-styles {
-  @apply w-full h-fit py-2 px-3 rounded-md flex items-center justify-between;
+  @apply max-w-full h-fit py-2 px-3 rounded-md flex items-center justify-between;
 }
 
 .btn {

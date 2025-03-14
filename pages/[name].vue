@@ -1,7 +1,7 @@
 <template>
-    <div class="w-[400px] mx-auto">
+    <div class="w-screen max-w-[400px] px-2 md:mx-auto">
         <previewCompProfile :profile="store.profile" :props="props" />
-        <previewCompLinks :listLinks="store.links" :previewPage="previewPage" />
+        <previewCompLinks  :listLinks="store.links" :previewPage="previewPage" />
     </div>
 </template>
 <script setup lang="ts">

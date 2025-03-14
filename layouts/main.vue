@@ -37,7 +37,7 @@
         <menuRightNav :class="{ 'hidden': hideMenu }" class="drop-menu-styles md:hidden flex flex-col gap-y-2" />
         <menuRightNav class="hidden md:flex gap-x-2" />
     </nav>
-    <main class="mx-3 md:mx-0">
+    <main class="md:mx-0">
         <slot />
     </main>
 </template>
