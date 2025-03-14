@@ -32,16 +32,21 @@
             </div>
             <div v-if="store.links.length > 0"
                 class="absolute bottom-0 bg-white w-full h-16 rounded-b-md border-t border-gray-200 flex items-center justify-end gap-x-3">
-                <div v-if="isError"
-                    class="bg-red-200 text-red-500 py-2 px-10 flex gap-x-2 items-center rounded-lg text-sm">
-                    <Icon name="material-symbols:info" size="1.5rem" />
-                    <p class="font-medium"> {{ errorMessage }}</p>
-                </div>
+
+                <span v-if="isError" class="mr-5 text-red-700 font-medium flex items-center gap-x-2 bg-red-50 rounded-2xl py-1 px-2 ">
+                    <Icon name="rivet-icons:exclamation-mark-circle" size="20" /> {{ errorMessage }}
+                </span>
+
+                <span v-if="saveSuccess"
+                    class="mr-5 text-green-700 font-medium flex items-center gap-x-2 bg-green-50 rounded-2xl py-1 px-2 ">
+                    <Icon name="fluent:checkmark-circle-12-regular" size="20" /> {{ successMessage }}
+                </span>
 
                 <span v-if="saveLoading"
                     class="text-white w-fit bg-blue-300 cursor-not-allowed flex items-center justify-center rounded-lg py-2 px-10 mr-5">
                     <Icon name="line-md:loading-twotone-loop" size="1.5rem" />
                 </span>
+
                 <button v-if="!saveLoading" @click="saveData"
                     class="py-2 px-10 bg-blue-500 rounded-lg text-white mr-5 hover:bg-blue-600">Save</button>
             </div>
@@ -83,10 +88,12 @@ const user = useSupabaseUser()
 const userId = ref<string>("")
 
 const saveLoading = ref(false)
-const errorMessage = ref('there is an testing')
+const errorMessage = ref('failed to save')
 const isError = ref(false)
 
 const max = 5;
+const successMessage = ref("successfully saved")
+let saveSuccess = ref(false)
 
 
 definePageMeta({
@@ -163,6 +170,8 @@ const saveData = async () => {
     }
 
     saveLoading.value = false
+    saveSuccess.value = true;
+    setTimeout(() => saveSuccess.value = false, 3400)
 }
 
 // get current user uuid data(auth required)

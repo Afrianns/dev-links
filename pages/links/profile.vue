@@ -58,14 +58,18 @@
             </div>
             <div
                 class="absolute bottom-0 bg-white w-full h-16 rounded-b-md border-t border-gray-200 flex items-center justify-end">
-                <p v-if="errorUpdated"
+                <span v-if="saveFailed"
                     class="mr-5 text-red-700 font-medium flex items-center gap-x-2 bg-red-50 rounded-2xl py-1 px-2 ">
-                    <Icon name="rivet-icons:exclamation-mark-circle" size="20" /> {{ errorUpdated }}
-                </p>
+                    <Icon name="rivet-icons:exclamation-mark-circle" size="20" /> {{ saveFailed }}
+                </span>
+                <span v-if="saveSuccess"
+                    class="mr-5 text-green-700 font-medium flex items-center gap-x-2 bg-green-50 rounded-2xl py-1 px-2 ">
+                    <Icon name="fluent:checkmark-circle-12-regular" size="20" /> {{ successMessage }}
+                </span>
+
                 <button v-if="!saveProfileLoading" @click="updateUser()"
                     class="bg- py-2 px-14 bg-blue-500 rounded-lg text-white mr-5 hover:bg-blue-600">Save</button>
-                <span v-if="saveProfileLoading"
-                    class="bg- py-2 px-14 bg-blue-500 rounded-lg text-white mr-5 hover:bg-blue-600 flex">
+                <span v-if="saveProfileLoading" class="bg- py-2 px-14 rounded-lg text-white mr-5 flex bg-blue-300 ">
                     <Icon name="line-md:loading-twotone-loop" size="24" class="bg-white" />
                 </span>
             </div>
@@ -77,6 +81,9 @@
 import { useLinksStore } from '~/store/LinksStore'
 const store = useLinksStore()
 const supabase = useSupabaseClient()
+
+const successMessage = ref("successfully saved")
+let saveSuccess = ref(false)
 
 definePageMeta({
     layout: 'main'
@@ -94,7 +101,7 @@ let profilePict = ref()
 let urlNameError = ref('')
 let emailError = ref('')
 
-let errorUpdated = ref('')
+let saveFailed = ref('')
 
 let confirmEmailNotif = ref(false)
 let saveProfileLoading = ref(false)
@@ -160,13 +167,20 @@ const updateUser = async () => {
 
     if (error) {
         console.log(error.message)
-        errorUpdated.value = error.message
+        saveFailed.value = error.message
+
+        saveProfileLoading.value = false
+        return
     }
+
     // reset error infos for url and email
     urlNameError.value = ''
     emailError.value = ''
 
     saveProfileLoading.value = false
+
+    saveSuccess.value = true;
+    setTimeout(() => saveSuccess.value = false, 3400)
 }
 
 // watch for individual profile data,
